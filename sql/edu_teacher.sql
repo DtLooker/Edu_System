@@ -21,3 +21,7 @@ CREATE TABLE `edu_teacher` (
 INSERT INTO `edu_teacher` VALUES
  ('1', '张三', '0', 'zhangsan', 'zhangsan@mail.com', '123123', '123213'),
  ('2', '李四', '0', 'lisi', 'lisi@yunzhi.club', '123213', '1232');
+
+
+ ALTER TABLE `edu_teacher` ADD `password` VARCHAR(40)  NOT NULL COMMENT '密码';
+ ALTER TABLE `edu_teacher` DROP `password`;
