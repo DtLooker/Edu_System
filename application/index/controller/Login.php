@@ -28,4 +28,20 @@ class Login extends Controller
             return $this->error('username not exist', url('index'));
         }
     }
+
+    //注销
+    public function logOut()
+    {
+        if (TeacherModel::logOut()) {
+            return $this->success('logout success', url('index'));
+        } else {
+            return $this->error('logout error', url('index'));
+        }
+    }
+
+    public function test()
+    {
+        $hello = ['hello'];
+        echo TeacherModel::encryptPassword($hello);
+    }
 }

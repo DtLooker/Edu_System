@@ -8,40 +8,37 @@ use think\Request;
 /**
  * 教师管理
  */
-class Teacher extends Controller
+class Teacher extends Index
 {
     public function index()
     {
-        try {
-            $name = Request::instance()->get('name');
 
-            $pageSize = 5;//每页显示5条数据
+        //获取查询信息
+        //$name = Request::instance()->get('name');
+        $name = input('get.name');
 
-            $TeacherModel = new TeacherModel();
+        $pageSize = 5;//每页显示5条数据
 
-            //定制查询信息
-            if (!empty($name)) {
-                $TeacherModel->where('name', 'like', '%' . $name . '%');
-            }
+        $TeacherModel = new TeacherModel();
 
-            $teachers = $TeacherModel->paginate($pageSize, false, [
-                'query'=>[
-                    'name' => $name,
-                ],
-            ]);
-
-            //向V层传递数据
-            $this->assign('teachers', $teachers);
-            //取回打包好的数据
-            $htmls = $this->fetch();
-            //将数据返回给用户
-            return $htmls;
-        } catch (\think\Exception\HttpResponseException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            //throw $e;
-            return $e->getMessage();
+        //定制查询信息
+        if (!empty($name)) {
+            $TeacherModel->where('name', 'like', '%' . $name . '%');
         }
+
+        $teachers = $TeacherModel->where('name', 'like', '%' .$name. '%')
+                                     ->paginate($pageSize, false, [
+                                            'query'=>[
+                                                'name' => $name,
+                                            ],
+                                        ]);
+
+        //向V层传递数据
+        $this->assign('teachers', $teachers);
+        //取回打包好的数据
+        $htmls = $this->fetch();
+        //将数据返回给用户
+        return $htmls;
     }
 
     public function insert()

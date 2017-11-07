@@ -52,7 +52,39 @@ class Teacher extends Model
      */
     public static function encryptPassword($password)
     {
+        if (!is_string($password)) {
+            throw new \RunntimeException("传入变量类型为非字符串，错误码2", 2);
+        }
+
         //实际过程中，我们可以借助不同支付穿算法，实现不同加密
         return sha1(md5($password) . 'looker');
+    }
+
+    /**
+     * 注销
+     * @return [bool] [成功返回true， 失败false]
+     */
+    public static function logOut()
+    {
+        //销毁session中数据
+        $teacherId = session('teacherId', null);
+        if (is_null($teacherId)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    /**
+     * 判断用户是否已经登录
+     * @return boolean [已经登录true]
+     */
+    public static function isLogin()
+    {
+        $teacherId = session('teacherId');
+        if (isset($teacherId)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
