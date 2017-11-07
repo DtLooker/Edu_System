@@ -21,17 +21,17 @@ class Teacher extends Index
 
         $TeacherModel = new TeacherModel();
 
-        //定制查询信息
-        if (!empty($name)) {
-            $TeacherModel->where('name', 'like', '%' . $name . '%');
-        }
-
+        //定查询信息
         $teachers = $TeacherModel->where('name', 'like', '%' .$name. '%')
-                                     ->paginate($pageSize, false, [
+                                     ->paginate(
+                                         $pageSize,
+                                         false,
+                                        [
                                             'query'=>[
                                                 'name' => $name,
                                             ],
-                                        ]);
+                                        ]
+                                     );
 
         //向V层传递数据
         $this->assign('teachers', $teachers);
