@@ -94,31 +94,25 @@ class Teacher extends Index
          */
 
         //“/d”表示将数值转换成“整形"
-        try {
-            //获取get数据
-            $id = Request::instance()->param('id/d');
-            //判断是否接收成功
-            if (0 === $id) {
-                throw new \Exception('未获取到ID信息', 1);
-            }
-            //获取要删除的对象
-            $Teacher = TeacherModel::get($id);
-            //要删除的对象存在
-            if (is_null($Teacher)) {
-                throw new \Exception("不存在ID为" .$id. '的教师，删除失败', 1);
-            }
-            //删除对象
-            if (!$Teacher->delete()) {
-                return $this-> error('删除失败：' . $Teacher->getError());
-            }
-            //获取到正常的异常时候，直接向上抛出，交给ThinkPhp处理
-        } catch (\think\Exception\HttpResponseException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            return $e->getMessage();
+
+        //获取get数据
+        $id = Request::instance()->param('id/d');
+        //判断是否接收成功
+        if (is_null($id) || 0 === $id) {
+            throw new \Exception('未获取到ID信息', 1);
+        }
+        //获取要删除的对象
+        $Teacher = TeacherModel::get($id);
+        //要删除的对象存在
+        if (is_null($Teacher)) {
+            throw new \Exception("不存在ID为" .$id. '的教师，删除失败', 1);
+        }
+        //删除对象
+        if (!$Teacher->delete()) {
+            return $this-> error('删除失败：' . $Teacher->getError());
         }
         //进行跳转
-        return $this->success('删除成功', $Request->header('referer'));
+        return $this->success('删除成功', url('index'));
     }
 
     public function edit()
