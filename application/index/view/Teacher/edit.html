@@ -1,18 +1,16 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>编辑数据</title>
-    </head>
-    <body class="container">
-        <div class="row">
-            <div class="col-md-12">
+{extend name="edit"}
+{block name="title"}
+{eq name="Teacher->id" values=""}添加教师{else /}编辑教师{/eq}
+{/block}
+{block name="content"}
+                {php}$action = request()->action() === 'add' ? 'save' : 'update';{/php}
                 <form action="{:url('update')}" method="post">
                     <label>姓名：</label>
                     <input type="hidden" name="id" value="{$Teacher->getData('id')}">
                     <input type="text" name="name" value="{$Teacher->getData('name')}">
                     <label>用户名：</label>
-                    <input type="text" name="username" value="{$Teacher->getData('username')}">
+                    {eq name="Teacher->username" value=""}
+                    <input type="text" name="username" value="{$Teacher->username}">{else /}{$Teacher->username}{/eq}
                     <label>性别：</label>
                     <select class="" name="sex">
                         <option value="0">男</option>
@@ -22,7 +20,4 @@
                     <input type="email" name="email" value="{$Teacher->getData('email')}">
                     <button type="submit" >保存</button>
                 </form>
-            </div>
-        </div>
-    </body>
-</html>
+{/block}

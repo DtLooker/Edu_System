@@ -41,48 +41,31 @@ class Teacher extends Index
         return $htmls;
     }
 
-    public function insert()
+    public function save()
     {
-        try {
-            $message = '';
-            //Request::instance()返回一个对象，调用这个对象的post方法，得到post数据
-            $postData = Request::instance()->post();
-            //实例化Teacher空对象
-            $Teacher = new TeacherModel();
-            //为对象的属性赋值
-            $Teacher->name = $postData['name'];
-            $Teacher->username =  $postData['username'];
-            $Teacher->sex = $postData['sex'];
-            $Teacher->email = $postData['email'];
-
-            //新增对象至数据表
-            $result = $Teacher->validate(true)->save($Teacher->getData());
-
-            //反馈结果
-            if (false === $result) {
-                $message = '新增失败：' . $Teacher->getError();
-            } else {
-                //新增成功，跳转至教师管理列表
-                return $this->success('用户' .$Teacher->name . '新增成功。', url('index'));
-            }
-            //ThinkPHP内置异常，向上抛出，给ThinkPHP处理
-        } catch (\think\Exception\HttpResponseException $e) {
-            throw $e;
-            //获取到正常异常时，输出异常
-        } catch (\Exception $e) {
-            return $e->getMessage();
+        //实例化
+        $TeacherModel = new TeacherModel();
+        //新增数据
+        if (!$this->saveTeacher($TeacherModel)) {
+            return $this->erro('操作失败' . $Teacher->getError());
         }
-        return $this->error($message);
+        //新增成功，跳转至index触发器
+        return $this->success('操作成功', url('index'));
     }
 
     public function add()
     {
-        try {
-            $htmls = $this->fetch();
-            return $htmls;
-        } catch (\Exception $e) {
-            return '系统错误'. $e->getMessage();
-        }
+        //实例化
+        $TeacherModel = new TeacherModel();
+        //设置默认值
+        $TeacherModel->id = 0;
+        $TeacherModel->name = '';
+        $TeacherModel->username = '';
+        $TeacherModel->sex = 0;
+        $TeacherModel->email = '';
+        $this->assign('Teacher', $TeacherModel);
+        //调用edit模板
+        return $this->fetch('edit');
     }
 
     public function delete()
@@ -117,60 +100,57 @@ class Teacher extends Index
 
     public function edit()
     {
-        try {
-            //获取传入ID
-            $id = Request::instance()->param('id/d');
-            //判断是否成功接收
-            if (is_null($id) || 0 === $id) {
-                throw new \Exception('未获取到ID信息', 1);
-            }
-            //在Teacher表模型中国获取当前记录
-            if (is_null($Teacher = TeacherModel::get($id))) {
-                $this->error('系统未找到ID为' .$id. '的记录');
-            }
-            //将数据传递给V层
-            $this->assign('Teacher', $Teacher);
-            //获取封装好的V层内容
-            $htmls = $this->fetch();
-            //将封装好的V层内容返回给用户
-            return $htmls;
-        } catch (\think\Exception\HttpResponseException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            return $e->getMessage();
+        //获取传入ID
+        $id = Request::instance()->param('id/d');
+        //判断是否成功接收
+        if (is_null($id) || 0 === $id) {
+            throw new \Exception('未获取到ID信息', 1);
         }
+        //在Teacher表模型中国获取当前记录
+        if (is_null($Teacher = TeacherModel::get($id))) {
+            $this->error('系统未找到ID为' .$id. '的记录');
+        }
+        //将数据传递给V层
+        $this->assign('Teacher', $Teacher);
+        //获取封装好的V层内容
+        $htmls = $this->fetch();
+        //将封装好的V层内容返回给用户
+        return $htmls;
     }
 
     public function update()
     {
-        try {
-            //接收数据，获取要更新的关键字
-            $id = Request::instance()->post('id/d');
-            $message = '更新成功';
+        //接收数据，获取要更新的关键字
+        $id = Request::instance()->post('id/d');
+        //获取当前对象
+        $TeacherModel = TeacherModel::get($id);
 
-            //获取当前对象
-            $Teacher = Teacher::get($id);
-
-            if (!is_null($Teacher)) {
-                //写入要更新的数据
-                $Teacher->name = Request::instance()->post('name');
-                $Teacher->username = Request::instance()->post('username');
-                $Teacher->sex = Request::instance()->post('sex/d');
-                $Teacher->email = Request::instance()->post('email');
-
-                //更新
-                if (false === $Teacher->validate(true)->save()) {
-                    return $this->error('更新失败' .$Teacher->getError());
-                }
-            } else {
-                //调用PHP内置类时，需要在前面加上\
-                throw new \Exception('所更新的记录不存在', 1);
+        if (!is_null($TeacherModel)) {
+            if (!$this->saveTeacher($TeacherModel, true)) {
+                return $this->error('操作失败' . $Teacher->getError());
             }
-        } catch (\think\Exception\HttpResponseException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            return  $e->getMessage();
+        } else {
+            return $this->error('当前操作的记录不存在');
         }
         return $this->success('操作成功', url('index'));
+    }
+
+    /**
+     * 对数据进行保存或者更新
+     * @param  TeacherModel $TeacherModel [教师]
+     * @return [bool]                     [description]
+     */
+    private function saveTeacher(TeacherModel &$TeacherModel, $isUpdate = false)
+    {
+        //写入要更新的数据
+        $TeacherModel->name = input('post.name');
+        if (!$isUpdate) {
+            $TeacherModel->username = Request::instance()->post('username');
+        }
+        $TeacherModel->sex = input('post.sex/d');
+        $TeacherModel->email = input('post.email');
+
+        //更新或保存
+        return $TeacherModel->validate(true)->save($TeacherModel->getData());
     }
 }
