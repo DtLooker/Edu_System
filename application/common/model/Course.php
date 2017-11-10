@@ -17,11 +17,19 @@ class Course extends Model
     }
 
     /**
+     * 一对多关联
+     */
+    public function KlassCourse()
+    {
+        return $this->hasMany('KlassCourse');
+    }
+
+    /**
      * 获取是否存在相关关联记录
      * @param  Klass  $klass [description]
      * @return [type]        [description]
      */
-    public function getIsChecked(Klass &$klass)
+    public function getIsChecked(Klass &$Klass)
     {
         //取课程ID
         $courseId = (int)$this->id;
